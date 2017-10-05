@@ -1,6 +1,5 @@
 #! /usr/bin/env false
 
-use JSON::Fast;
 use Template::Mustache;
 
 unit module Ebuilder;
@@ -49,20 +48,6 @@ sub make-ebuild(%meta) returns Str is export
 	;
 
 	Template::Mustache.render(template, %context).trim;
-}
-
-sub make-ebuild-from-meta6(Str $path) returns Str is export
-{
-	my IO $file = $path.IO;
-
-	if (!$file.e) {
-		die "No such file or directory: $path";
-	}
-
-	my %meta = from-json($file.slurp);
-	my Str $output;
-
-	return make-ebuild(%meta);
 }
 
 sub template() returns Str is export

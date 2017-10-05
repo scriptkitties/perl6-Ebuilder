@@ -3,18 +3,26 @@
 use v6.c;
 
 use Ebuilder;
+use JSON::Fast;
 
 sub MAIN(*@files)
 {
-	for @files -> $file {
-		make-ebuild-from-meta6($file);
+	# Ensure the directory structure exists
+	mkdir("dev-perl");
 
-		# Ensure the directory structure exists
-		mkdir("dev-perl");
+	for @files -> $path {
+		my IO $file = $path.IO;
 
+		if (!$file.e) {
+			say "No such file or directory: $path";
+			next;
+		}
+
+		my %meta = from-json(slurp $file);
+		my Str $ebuild = make-ebuild(%meta);
 		my Str $atom-name = atom-name(%meta<name>, 9999);
 
-		spurt("{$atom-name}.ebuild", $output);
+		spurt("{$atom-name}.ebuild", $ebuild);
 
 		say "Saved $atom-name";
 	}
